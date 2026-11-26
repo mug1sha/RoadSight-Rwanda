@@ -108,6 +108,73 @@ svg, canvas, .js-plotly-plot * { transition: none !important; }
 
 /* filter select arrow fix on dark */
 .dark select option { background: #19231D; color: #F4F7F4; }
+
+/* ── Mobile filter panel ─────────────────────────────────────── */
+#filter-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.32s cubic-bezier(0.4,0,0.2,1),
+              opacity    0.25s ease,
+              transform  0.25s ease;
+  opacity: 0;
+  transform: translateY(-6px);
+}
+#filter-panel.open {
+  max-height: 320px;
+  opacity: 1;
+  transform: translateY(0);
+}
+/* pill chip selectors */
+.filter-chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.filter-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 12px; border-radius: 999px; cursor: pointer;
+  font-size: 12px; font-weight: 500; line-height: 1;
+  border: 1.5px solid transparent;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.filter-chip:active { transform: scale(0.95); }
+.filter-chip.chip-idle {
+  background: #F3F4F6;
+  border-color: #E5E7EB;
+  color: #4B5563;
+}
+.dark .filter-chip.chip-idle {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.08);
+  color: #A0ADA4;
+}
+.filter-chip.chip-active {
+  background: #E6F2EB;
+  border-color: #19B875;
+  color: #075B3E;
+}
+.dark .filter-chip.chip-active {
+  background: rgba(53,199,134,0.15);
+  border-color: #35C786;
+  color: #35C786;
+}
+/* native select wrapper on desktop */
+.filter-select-wrap {
+  position: relative; display: inline-flex; align-items: center;
+}
+.filter-select-wrap svg {
+  position: absolute; right: 8px; pointer-events: none;
+  width: 12px; height: 12px; color: #9CA3AF;
+}
+.filter-select-wrap select { padding-right: 24px; appearance: none; -webkit-appearance: none; }
+
+/* KPI card compact on tiny screens */
+@media (max-width: 360px) {
+  #kpi-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .kpi-val  { font-size: 17px !important; }
+}
+/* Ensure charts never overflow on mobile */
+@media (max-width: 640px) {
+  .chart-pane { overflow: hidden; }
+}
 </style>
 </head>
 
@@ -265,61 +332,198 @@ svg, canvas, .js-plotly-plot * { transition: none !important; }
   </div>
 </header>
 
-<main class='flex-1 p-4 md:p-5'>
-<div id="filter-bar" class="flex flex-wrap items-center gap-2 mb-4
-     bg-white dark:bg-surface-dark rounded-card p-3 shadow-card
-     border border-black/[0.05] dark:border-white/[0.05]">
-  <span class="text-[11px] font-semibold text-gray-400 dark:text-green-200/40 uppercase tracking-wide mr-1">
-    Filter:
-  </span>
-  <select id="f-year" onchange="applyFilters()"
-          class="text-[12px] rounded-btn border border-black/[0.08] dark:border-white/[0.08]
-                 bg-gray-50 dark:bg-surface-dark2 text-gray-700 dark:text-green-100
-                 px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-green-500">
-    <option value="">All Years</option>
-    <option value="2022">2022</option>
-    <option value="2023">2023</option>
-    <option value="2024">2024</option>
-    <option value="2025">2025</option>
-  </select>
-  <select id="f-province" onchange="applyFilters()"
-          class="text-[12px] rounded-btn border border-black/[0.08] dark:border-white/[0.08]
-                 bg-gray-50 dark:bg-surface-dark2 text-gray-700 dark:text-green-100
-                 px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-green-500">
-    <option value="">All Provinces</option>
-    <option value="Kigali City">Kigali City</option>
-    <option value="Southern">Southern</option>
-    <option value="Eastern">Eastern</option>
-    <option value="Western">Western</option>
-    <option value="Northern">Northern</option>
-  </select>
-  <select id="f-severity" onchange="applyFilters()"
-          class="text-[12px] rounded-btn border border-black/[0.08] dark:border-white/[0.08]
-                 bg-gray-50 dark:bg-surface-dark2 text-gray-700 dark:text-green-100
-                 px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-green-500">
-    <option value="">All Severities</option>
-    <option value="Damage only">Damage only</option>
-    <option value="Minor injury">Minor injury</option>
-    <option value="Serious/grievous">Serious/grievous</option>
-    <option value="Fatal">Fatal</option>
-  </select>
-  <button onclick="clearFilters()"
-          class="text-[12px] px-3 py-1.5 rounded-btn
-                 bg-gray-100 dark:bg-surface-dark2
-                 border border-black/[0.08] dark:border-white/[0.08]
-                 text-gray-600 dark:text-green-200/60
-                 hover:bg-green-50 dark:hover:bg-green-400/10
-                 hover:text-green-700 dark:hover:text-green-400">
-    Clear
-  </button>
-  <span id="filter-status" class="ml-auto text-[11px] text-gray-400 dark:text-green-200/40 hidden sm:inline"></span>
-  <span id="filter-active-badge"
-        class="hidden text-[10px] font-semibold uppercase tracking-wide
-               bg-green-100 dark:bg-green-400/15 text-green-700 dark:text-green-400
-               px-2 py-0.5 rounded-full ml-1">
-    Filtered
-  </span>
-</div>
+<main class='flex-1 p-3 sm:p-4 md:p-5'>
+<div id="filter-bar"
+     class="mb-4 bg-white dark:bg-surface-dark rounded-card shadow-card
+            border border-black/[0.05] dark:border-white/[0.05] overflow-hidden">
+
+  <!-- ── Top row: always visible ───────────────────────────── -->
+  <div class="flex items-center gap-2 px-3 py-2.5">
+
+    <!-- Filter icon + label -->
+    <svg class="w-3.5 h-3.5 flex-shrink-0 text-gray-400 dark:text-green-200/40"
+         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+    </svg>
+    <span class="text-[11px] font-semibold uppercase tracking-wide
+                 text-gray-400 dark:text-green-200/40 hidden sm:inline">Filters</span>
+
+    <!-- Desktop: inline selects ───────────────────────────── -->
+    <div class="hidden sm:flex items-center gap-2 flex-wrap flex-1">
+      <div class="filter-select-wrap">
+        <select id="f-year" onchange="applyFilters()"
+                class="text-[12px] rounded-btn
+                       border border-black/[0.08] dark:border-white/[0.08]
+                       bg-gray-50 dark:bg-surface-dark2
+                       text-gray-700 dark:text-green-100
+                       pl-2.5 pr-7 py-1.5
+                       focus:outline-none focus:ring-1 focus:ring-green-500">
+          <option value="">All Years</option>
+          <option value="2022">2022</option>
+          <option value="2023">2023</option>
+          <option value="2024">2024</option>
+          <option value="2025">2025</option>
+        </select>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+      <div class="filter-select-wrap">
+        <select id="f-province" onchange="applyFilters()"
+                class="text-[12px] rounded-btn
+                       border border-black/[0.08] dark:border-white/[0.08]
+                       bg-gray-50 dark:bg-surface-dark2
+                       text-gray-700 dark:text-green-100
+                       pl-2.5 pr-7 py-1.5
+                       focus:outline-none focus:ring-1 focus:ring-green-500">
+          <option value="">All Provinces</option>
+          <option value="Kigali City">Kigali City</option>
+          <option value="Southern">Southern</option>
+          <option value="Eastern">Eastern</option>
+          <option value="Western">Western</option>
+          <option value="Northern">Northern</option>
+        </select>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+      <div class="filter-select-wrap">
+        <select id="f-severity" onchange="applyFilters()"
+                class="text-[12px] rounded-btn
+                       border border-black/[0.08] dark:border-white/[0.08]
+                       bg-gray-50 dark:bg-surface-dark2
+                       text-gray-700 dark:text-green-100
+                       pl-2.5 pr-7 py-1.5
+                       focus:outline-none focus:ring-1 focus:ring-green-500">
+          <option value="">All Severities</option>
+          <option value="Damage only">Damage only</option>
+          <option value="Minor injury">Minor injury</option>
+          <option value="Serious/grievous">Serious/grievous</option>
+          <option value="Fatal">Fatal</option>
+        </select>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+      <button onclick="clearFilters()"
+              class="text-[12px] px-3 py-1.5 rounded-btn ml-1
+                     bg-gray-100 dark:bg-surface-dark2
+                     border border-black/[0.08] dark:border-white/[0.08]
+                     text-gray-500 dark:text-green-200/50
+                     hover:bg-green-50 dark:hover:bg-green-400/10
+                     hover:text-green-700 dark:hover:text-green-400
+                     transition-colors">
+        Clear
+      </button>
+    </div>
+
+    <!-- Active badge (desktop) -->
+    <span id="filter-status"
+          class="hidden sm:inline ml-auto text-[11px]
+                 text-gray-400 dark:text-green-200/40 whitespace-nowrap"></span>
+    <span id="filter-active-badge"
+          class="hidden text-[10px] font-semibold uppercase tracking-wide
+                 bg-green-100 dark:bg-green-400/15
+                 text-green-700 dark:text-green-400
+                 px-2 py-0.5 rounded-full ml-1">
+      Filtered
+    </span>
+
+    <!-- Mobile: summary pill + toggle button ──────────────── -->
+    <div class="sm:hidden flex items-center gap-2 flex-1 justify-between">
+      <span id="mob-filter-summary"
+            class="text-[12px] text-gray-500 dark:text-green-200/50 truncate">
+        No filters active
+      </span>
+      <button onclick="toggleFilterPanel()" id="mob-filter-toggle"
+              class="flex items-center gap-1.5 pl-3 pr-2.5 py-1.5 rounded-full
+                     border border-black/[0.08] dark:border-white/[0.08]
+                     bg-gray-50 dark:bg-surface-dark2
+                     text-[12px] font-medium
+                     text-gray-600 dark:text-green-200/60
+                     active:scale-95 transition-transform flex-shrink-0">
+        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+        Filter
+        <svg id="mob-toggle-chevron"
+             class="w-3.5 h-3.5 transition-transform duration-200"
+             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+    </div>
+
+  </div><!-- /top row -->
+
+  <!-- ── Mobile expandable panel ───────────────────────────── -->
+  <div id="filter-panel" class="sm:hidden">
+    <div class="px-3 pb-4 pt-1 border-t border-black/[0.05] dark:border-white/[0.05]
+                space-y-4">
+
+      <!-- Year chips -->
+      <div>
+        <p class="text-[10px] font-semibold uppercase tracking-widest
+                  text-gray-400 dark:text-green-200/40 mb-2">Year</p>
+        <div class="filter-chip-row" id="chip-year">
+          <button onclick="setChip('year',''   ,this)" class="filter-chip chip-active" data-val="">All</button>
+          <button onclick="setChip('year','2022',this)" class="filter-chip chip-idle"  data-val="2022">2022</button>
+          <button onclick="setChip('year','2023',this)" class="filter-chip chip-idle"  data-val="2023">2023</button>
+          <button onclick="setChip('year','2024',this)" class="filter-chip chip-idle"  data-val="2024">2024</button>
+          <button onclick="setChip('year','2025',this)" class="filter-chip chip-idle"  data-val="2025">2025</button>
+        </div>
+      </div>
+
+      <!-- Province chips -->
+      <div>
+        <p class="text-[10px] font-semibold uppercase tracking-widest
+                  text-gray-400 dark:text-green-200/40 mb-2">Province</p>
+        <div class="filter-chip-row" id="chip-province">
+          <button onclick="setChip('province',''            ,this)" class="filter-chip chip-active" data-val="">All</button>
+          <button onclick="setChip('province','Kigali City' ,this)" class="filter-chip chip-idle"  data-val="Kigali City">Kigali</button>
+          <button onclick="setChip('province','Southern'    ,this)" class="filter-chip chip-idle"  data-val="Southern">Southern</button>
+          <button onclick="setChip('province','Eastern'     ,this)" class="filter-chip chip-idle"  data-val="Eastern">Eastern</button>
+          <button onclick="setChip('province','Western'     ,this)" class="filter-chip chip-idle"  data-val="Western">Western</button>
+          <button onclick="setChip('province','Northern'    ,this)" class="filter-chip chip-idle"  data-val="Northern">Northern</button>
+        </div>
+      </div>
+
+      <!-- Severity chips -->
+      <div>
+        <p class="text-[10px] font-semibold uppercase tracking-widest
+                  text-gray-400 dark:text-green-200/40 mb-2">Severity</p>
+        <div class="filter-chip-row" id="chip-severity">
+          <button onclick="setChip('severity',''                ,this)" class="filter-chip chip-active" data-val="">All</button>
+          <button onclick="setChip('severity','Damage only'     ,this)" class="filter-chip chip-idle"  data-val="Damage only">Damage</button>
+          <button onclick="setChip('severity','Minor injury'    ,this)" class="filter-chip chip-idle"  data-val="Minor injury">Minor</button>
+          <button onclick="setChip('severity','Serious/grievous',this)" class="filter-chip chip-idle"  data-val="Serious/grievous">Serious</button>
+          <button onclick="setChip('severity','Fatal'           ,this)" class="filter-chip chip-idle"  data-val="Fatal">Fatal</button>
+        </div>
+      </div>
+
+      <!-- Clear + Apply row -->
+      <div class="flex gap-2 pt-1">
+        <button onclick="clearFilters()"
+                class="flex-1 py-2.5 rounded-btn text-[13px] font-medium
+                       border border-black/[0.08] dark:border-white/[0.08]
+                       bg-gray-100 dark:bg-surface-dark2
+                       text-gray-600 dark:text-green-200/60
+                       active:scale-95 transition-transform">
+          Clear all
+        </button>
+        <button onclick="toggleFilterPanel()"
+                class="flex-1 py-2.5 rounded-btn text-[13px] font-medium
+                       bg-green-700 dark:bg-green-400 text-white dark:text-gray-900
+                       active:scale-95 transition-transform">
+          Done
+        </button>
+      </div>
+    </div>
+  </div><!-- /filter-panel -->
+
+</div><!-- /filter-bar -->
+
 <div id="sec-overview" class="section-panel">
   <div class="flex items-start gap-2 bg-amber-50 dark:bg-amber-900/20
             border border-amber-200 dark:border-amber-700/40
@@ -334,7 +538,7 @@ svg, canvas, .js-plotly-plot * { transition: none !important; }
     without validation against official Rwanda National Police or RURA data.
   </span>
 </div>
-  <div id="kpi-grid" class="grid grid-cols-2 xl:grid-cols-4 gap-3 mb-5">
+  <div id="kpi-grid" class="grid grid-cols-2 xl:grid-cols-4 gap-3 mb-4">
   <div class="bg-white dark:bg-surface-dark rounded-card p-4 shadow-card flex items-start gap-3
             hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200">
   <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-green-50 dark:bg-green-400/10 text-green-700 dark:text-green-400">
@@ -1068,6 +1272,10 @@ function applyFilters() {
   if(badge) badge.classList.toggle("hidden", active === 0);
   if(status) status.textContent = active ? active+" filter"+(active>1?"s":"")+" active" : "";
 
+  // Sync mobile chips to match desktop selects
+  syncChipsFromState();
+  updateMobileSummary();
+
   // Update KPIs and district panel from filtered aggregate
   updateKPIs();
   updateDistrictPanel();
@@ -1078,8 +1286,7 @@ function applyFilters() {
 
 function clearFilters() {
   F = {year:"all", province:"all", severity:""};
-  var selects = ["f-year","f-province","f-severity"];
-  selects.forEach(function(id) {
+  ["f-year","f-province","f-severity"].forEach(function(id) {
     var el = document.getElementById(id);
     if(el) el.value = "";
   });
@@ -1087,9 +1294,72 @@ function clearFilters() {
   var status = document.getElementById("filter-status");
   if(badge) badge.classList.add("hidden");
   if(status) status.textContent = "";
+  syncChipsFromState();
+  updateMobileSummary();
   updateKPIs();
   updateDistrictPanel();
   renderVisibleCharts();
+}
+
+// ── Mobile filter panel ────────────────────────────────────────────────────────
+function toggleFilterPanel() {
+  var panel   = document.getElementById("filter-panel");
+  var chevron = document.getElementById("mob-toggle-chevron");
+  var isOpen  = panel.classList.contains("open");
+  panel.classList.toggle("open", !isOpen);
+  if(chevron) chevron.style.transform = isOpen ? "" : "rotate(180deg)";
+}
+
+// Called by chip buttons on mobile
+function setChip(dim, val, btn) {
+  // Update hidden <select> so applyFilters() reads it
+  var selectId = dim === "year" ? "f-year" : dim === "province" ? "f-province" : "f-severity";
+  var sel = document.getElementById(selectId);
+  if(sel) sel.value = val;
+
+  // Visual: deactivate all chips in this group, activate clicked one
+  var group = document.getElementById("chip-" + dim);
+  if(group) {
+    group.querySelectorAll(".filter-chip").forEach(function(c) {
+      c.classList.remove("chip-active");
+      c.classList.add("chip-idle");
+    });
+  }
+  if(btn) {
+    btn.classList.remove("chip-idle");
+    btn.classList.add("chip-active");
+  }
+
+  applyFilters();
+}
+
+// Keep chips in sync when desktop selects change
+function syncChipsFromState() {
+  var map = {year: F.year === "all" ? "" : F.year,
+             province: F.province === "all" ? "" : F.province,
+             severity: F.severity};
+  ["year","province","severity"].forEach(function(dim) {
+    var group = document.getElementById("chip-" + dim);
+    if(!group) return;
+    var val = map[dim];
+    group.querySelectorAll(".filter-chip").forEach(function(c) {
+      var match = c.dataset.val === val;
+      c.classList.toggle("chip-active", match);
+      c.classList.toggle("chip-idle",  !match);
+    });
+  });
+}
+
+function updateMobileSummary() {
+  var el = document.getElementById("mob-filter-summary");
+  if(!el) return;
+  var parts = [];
+  if(F.year !== "all")     parts.push(F.year);
+  if(F.province !== "all") parts.push(F.province);
+  if(F.severity !== "")    parts.push(F.severity);
+  el.textContent = parts.length ? parts.join(" · ") : "No filters active";
+  // Colour the summary text green when active
+  el.style.color = parts.length ? "var(--tw-prose-links, #075B3E)" : "";
 }
 
 // ═══════════════════════════════════════════════════════════════
