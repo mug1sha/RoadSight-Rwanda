@@ -1,0 +1,11 @@
+pandas>=2.0
+numpy>=1.26
+matplotlib>=3.8
+seaborn>=0.13
+scikit-learn>=1.4
+plotly>=5.20
+nbformat>=5.9
+ipykernel>=6.29
+jupyterlab>=4.1
+imbalanced-learn>=0.12
+xgboost>=2.0
