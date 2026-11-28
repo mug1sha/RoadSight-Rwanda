@@ -2,5 +2,9 @@
   "outputDirectory": "dashboard",
   "cleanUrls": true,
   "trailingSlash": false,
-  "framework": null
+  "framework": null,
+  "rewrites": [
+    { "source": "/dashboard", "destination": "/dashboard.html" }
+  ]
 }
+
