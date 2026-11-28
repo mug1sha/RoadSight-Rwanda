@@ -14,3 +14,6 @@ __pycache__/
 
 # OS files
 .DS_Store
+
+# Original large video assets (use compressed versions instead)
+dashboard/public/14635462_3840_2160_24fps.mp4

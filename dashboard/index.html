@@ -74,8 +74,8 @@ html, body {
   height: 100%; min-height: 100dvh;
   overflow: hidden;
   font-family: 'Inter', ui-sans-serif, system-ui;
-  background: var(--bg);
-  color: var(--text-primary);
+  background: #060E08;
+  color: #E8F0EB;
   transition: background 0.25s, color 0.2s;
 }
 
@@ -87,83 +87,85 @@ html, body {
 
 /* ── Layout shell ────────────────────────────────────────────── */
 .hero {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr;
+  position: relative;
   min-height: 100dvh;
   max-height: 100dvh;
   overflow: hidden;
-  position: relative;
+  display: flex;
+  align-items: center;
 }
 
-@media (max-width: 1023px) {
-  html, body { overflow: auto; }
-  .hero {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
-    min-height: 100dvh;
-    max-height: none;
-    overflow: visible;
-  }
+/* ── Video background ────────────────────────────────────────── */
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* ── Scrim overlay ───────────────────────────────────────────── */
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(to right,
+      rgba(4,20,10,0.90) 0%,
+      rgba(4,20,10,0.75) 42%,
+      rgba(4,20,10,0.35) 68%,
+      rgba(4,20,10,0.12) 100%
+    );
 }
 
 /* ── Left panel ──────────────────────────────────────────────── */
 .hero-left {
+  position: relative;
+  z-index: 10;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: clamp(2rem, 5vw, 5rem) clamp(2rem, 4vw, 4.5rem);
-  position: relative;
-  z-index: 10;
-  overflow: hidden;
-}
-
-/* subtle topographic texture lines on left */
-.hero-left::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 39px, var(--border) 40px),
-    repeating-linear-gradient(90deg, transparent, transparent 79px, var(--border) 80px);
-  background-size: 80px 40px;
-  opacity: 0.3;
-  pointer-events: none;
+  width: min(620px, 55%);
+  min-height: 100dvh;
 }
 
 /* ── Right panel ─────────────────────────────────────────────── */
 .hero-right {
   position: relative;
+  z-index: 10;
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
-  background: linear-gradient(145deg, var(--teal) 0%, var(--forest) 60%, #0A2A1C 100%);
-}
-
-.dark .hero-right {
-  background: linear-gradient(145deg, #042928 0%, #053D2A 60%, #030F07 100%);
+  min-height: 100dvh;
+  pointer-events: none;
 }
 
 @media (max-width: 1023px) {
+  html, body { overflow: auto; }
+  .hero {
+    flex-direction: column;
+    max-height: none;
+    min-height: 100dvh;
+  }
+  .hero-scrim {
+    background: rgba(4,20,10,0.78);
+  }
   .hero-left {
-    padding: 3rem 2rem 2rem;
-    min-height: 55dvh;
+    width: 100%;
+    min-height: auto;
+    padding: 5rem 2rem 2rem;
   }
   .hero-right {
     min-height: 45dvh;
+    width: 100%;
   }
 }
 @media (max-width: 640px) {
-  .hero-left {
-    padding: 2.5rem 1.5rem 1.5rem;
-    min-height: 58dvh;
-    justify-content: flex-start;
-    padding-top: 4rem;
-  }
-  .hero-right {
-    min-height: 42dvh;
-  }
+  .hero-left { padding: 4.5rem 1.5rem 1.5rem; }
+  .hero-right { min-height: 40dvh; }
 }
 
 /* ── Eyebrow label ───────────────────────────────────────────── */
@@ -175,18 +177,13 @@ html, body {
   font-weight: 700;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--forest);
-  background: var(--sage);
-  border: 1px solid var(--border);
+  color: #35C786;
+  background: rgba(53,199,134,0.12);
+  border: 1px solid rgba(53,199,134,0.25);
   border-radius: 999px;
   padding: 5px 14px;
   margin-bottom: 1.5rem;
   width: fit-content;
-}
-.dark .eyebrow {
-  color: #35C786;
-  background: rgba(53,199,134,0.10);
-  border-color: rgba(53,199,134,0.2);
 }
 .eyebrow-dot {
   width: 6px; height: 6px;
@@ -202,15 +199,14 @@ html, body {
   font-weight: 800;
   line-height: 1.08;
   letter-spacing: -0.03em;
-  color: var(--text-primary);
+  color: #FFFFFF;
   margin-bottom: 1.25rem;
 }
 .headline em {
   font-style: normal;
-  color: var(--forest);
+  color: #35C786;
   position: relative;
 }
-.dark .headline em { color: #35C786; }
 .headline em::after {
   content: '';
   position: absolute;
@@ -218,7 +214,7 @@ html, body {
   height: 3px;
   background: var(--coral);
   border-radius: 2px;
-  opacity: 0.6;
+  opacity: 0.65;
 }
 
 /* ── Subhead ─────────────────────────────────────────────────── */
@@ -226,7 +222,7 @@ html, body {
   font-size: clamp(0.875rem, 1.3vw, 1.0625rem);
   font-weight: 400;
   line-height: 1.65;
-  color: var(--text-secondary);
+  color: rgba(232,240,235,0.72);
   max-width: 46ch;
   margin-bottom: 2rem;
 }
@@ -287,7 +283,7 @@ html, body {
 .meta-value {
   font-size: 1.125rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #FFFFFF;
   letter-spacing: -0.02em;
 }
 .meta-label {
@@ -295,12 +291,12 @@ html, body {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: rgba(232,240,235,0.45);
 }
 .meta-sep {
   width: 1px;
   height: 28px;
-  background: var(--border);
+  background: rgba(255,255,255,0.15);
   flex-shrink: 0;
 }
 @media (max-width: 640px) {
@@ -321,24 +317,21 @@ html, body {
   background: var(--forest);
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(7,91,62,0.3);
+  box-shadow: 0 2px 12px rgba(7,91,62,0.5);
 }
 .brand-name {
   font-size: 1.0625rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: var(--text-primary);
+  color: #FFFFFF;
 }
-.brand-name span {
-  color: var(--forest);
-}
-.dark .brand-name span { color: #35C786; }
+.brand-name span { color: #35C786; }
 .brand-tagline {
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: rgba(232,240,235,0.4);
   margin-top: 1px;
 }
 
@@ -349,15 +342,15 @@ html, body {
   z-index: 100;
   width: 40px; height: 40px;
   border-radius: 10px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.15);
+  backdrop-filter: blur(8px);
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
-  color: var(--text-secondary);
-  box-shadow: var(--shadow-sm);
+  color: rgba(232,240,235,0.7);
   transition: background 0.2s, color 0.15s, transform 0.15s;
 }
-.theme-btn:hover { transform: scale(1.05); color: var(--forest); }
+.theme-btn:hover { transform: scale(1.05); color: #35C786; background: rgba(255,255,255,0.15); }
 
 /* ── Map artwork animations ──────────────────────────────────── */
 .road-path {
@@ -425,17 +418,7 @@ html, body {
   animation: fadeIn 1.5s ease both;
 }
 
-/* grid dots pattern on right panel */
-.hero-right::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
-  background-size: 28px 28px;
-  pointer-events: none;
-  z-index: 0;
-}
-/* glow */
+/* grid dots on right panel — now subtle over video */
 .hero-right::after {
   content: '';
   position: absolute;
@@ -443,7 +426,7 @@ html, body {
   height: 50%;
   top: 25%;
   left: 25%;
-  background: radial-gradient(ellipse, rgba(243,111,80,0.12) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(243,111,80,0.08) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -467,7 +450,7 @@ html, body {
   font-size: 10.5px;
   font-weight: 500;
   letter-spacing: 0.04em;
-  color: var(--text-muted);
+  color: rgba(232,240,235,0.35);
   white-space: nowrap;
   z-index: 50;
   pointer-events: none;
@@ -512,6 +495,15 @@ html, body {
 
 <!-- Hero -->
 <div class="hero">
+
+  <!-- ── Video background ── -->
+  <video class="hero-video" autoplay muted loop playsinline preload="auto"
+         aria-hidden="true">
+    <source src="/public/hero.mp4" type="video/mp4">
+  </video>
+
+  <!-- ── Scrim ── -->
+  <div class="hero-scrim"></div>
 
   <!-- ── LEFT PANEL ── -->
   <div class="hero-left">
